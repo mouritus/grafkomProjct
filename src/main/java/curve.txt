@@ -1,0 +1,110 @@
+//init
+objectPointControl.add(new Object(
+                Arrays.asList(
+                        new ShaderProgram.ShaderModuleData
+                                ("resources/shaders/scene.vert"
+                                        , GL_VERTEX_SHADER),
+                        new ShaderProgram.ShaderModuleData
+                                ("resources/shaders/scene.frag"
+                                        , GL_FRAGMENT_SHADER)
+                ),
+                new ArrayList<>(),
+                new Vector4f(0.0f, 1.0f, 1.0f, 1.0f)
+        ));
+        objectPointCurve.add(new Object(
+                Arrays.asList(
+                        new ShaderProgram.ShaderModuleData
+                                ("resources/shaders/scene.vert"
+                                        , GL_VERTEX_SHADER),
+                        new ShaderProgram.ShaderModuleData
+                                ("resources/shaders/scene.frag"
+                                        , GL_FRAGMENT_SHADER)
+                ),
+                new ArrayList<>(),
+                new Vector4f(0.0f, 1.0f, 1.0f, 1.0f)
+        ));
+
+
+// input
+        boolean collide = false;
+        float size = 0.08f;
+
+        Vector2f pos = window.getMousInput().getCurrentPos();
+        pos = convertRange(pos, window.getHeight(), window.getWidth());
+int temp = -1;
+        for (int i = 0; i < objectsRectangle.size(); i++) {
+            Rectangle x = (Rectangle) objectsRectangle.get(i);
+            if (pos.x > x.getPosX1() && pos.x < x.getPosX2() && pos.y > x.getPosY1() && pos.y < x.getPosY2()) {
+                collide = true;
+                dragDrop = true;
+                temp = i;
+                var = temp;
+                break;
+            }
+        }
+        if (dragDrop) {
+            collide = true;
+            temp = var;
+        }
+
+        if (window.getMousInput().isLeftButtonPressed() && !collide) {
+            if ((!(pos.x > 1 || pos.x < -0.97) && !(pos.y > 0.97 || pos.y < -1))) {
+
+                objectsRectangle.add(new Rectangle(
+                        Arrays.asList(
+                                //shaderFile lokasi menyesuaikan objectnya
+                                new ShaderProgram.ShaderModuleData
+                                        ("resources/shaders/scene.vert"
+                                                , GL_VERTEX_SHADER),
+                                new ShaderProgram.ShaderModuleData
+                                        ("resources/shaders/scene.frag"
+                                                , GL_FRAGMENT_SHADER)
+                        ),
+                        new ArrayList<>(
+                                List.of(
+                                        new Vector3f(pos.x - size, pos.y - size, 0),
+                                        new Vector3f(pos.x - size, pos.y + size, 0),
+                                        new Vector3f(pos.x + size, pos.y - size, 0),
+                                        new Vector3f(pos.x + size, pos.y + size, 0)
+                                )
+                        ),
+                        new Vector4f(0.0f, 0.0f, 1.0f, 0.0f),
+                        Arrays.asList(0, 1, 2, 1, 2, 3)
+
+                ));
+
+            }
+            objectPointControl.get(0).addVertices(new Vector3f(pos.x, pos.y, 0));
+            objectPointControl.get(0).bezierCurve(objectPointCurve.get(0));
+        }
+
+
+        if (collide && !window.getMousInput().isLeftButtonReleased()) {
+            objectsRectangle.get(temp).changePosition(new ArrayList<>(
+                    List.of(
+                            new Vector3f(pos.x - size, pos.y - size, 0),
+                            new Vector3f(pos.x - size, pos.y + size, 0),
+                            new Vector3f(pos.x + size, pos.y - size, 0),
+                            new Vector3f(pos.x + size, pos.y + size, 0)
+                    )
+            ));
+            objectPointControl.get(0).changePosition(new Vector3f(pos.x, pos.y, 0), temp);
+            objectPointControl.get(0).bezierCurve(objectPointCurve.get(0));
+        }
+
+        if (window.getMousInput().isLeftButtonReleased()) {
+            dragDrop = false;
+        }
+
+        //        if (window.getMousInput().isLeftButtonPressed()) {
+        //            Vector2f pos = window.getMousInput().getCurrentPos();
+        //
+        //            pos.x = (pos.x - (window.getWidth()) / 2.0f) / (window.getWidth() / 2.0f);
+        //
+        //            pos.y = (pos.y - (window.getWidth()) / 2.0f) / (-window.getHeight() / 2.0f);
+        //
+        //            if ((!(pos.x > 1 || pos.x < -0.97) && !(pos.y > 0.97 || pos.y < -1))) {
+        //                System.out.println("x : " + pos.x + " y : " + pos.y);
+        //                objectPointControl.get(0).addVertices(new Vector3f(pos.x, pos.y, 0));
+        //            }
+        //        }
