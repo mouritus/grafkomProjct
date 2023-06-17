@@ -1,17 +1,8 @@
-#version 330
-//Directional Light
-struct DirLight{
-    vec3 direction;
-
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-};
 uniform DirLight dirLight;
 
-struct PointLight{
+struct PointLight
+{
     vec3 position;
-
     float constant;
     float linear;
     float quadratic;
@@ -20,6 +11,7 @@ struct PointLight{
     vec3 diffuse;
     vec3 specular;
 };
+//Array
 #define NR_POINT_LIGHTS 4
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 
@@ -39,10 +31,13 @@ struct SpotLight{
     float quadratic;
 };
 uniform SpotLight spotLight;
+
 uniform vec4 uni_color;
+in  vec2 outTexCoord;
 out vec4 frag_color;
 
 uniform vec3 viewPos;
+uniform sampler2D texture_sampler;
 
 in vec3 Normal;
 in vec3 FragPos;
@@ -81,6 +76,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     specular *= attenuation;
     return (ambient + diffuse + specular);
 }
+
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
 
@@ -111,19 +107,23 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     specular *= attenuation * intensity;
     return (ambient + diffuse + specular);
 }
-void main() {
 
-    //properties
+void main(){
     vec3 normal = normalize(Normal);
-    vec3 viewDir = normalize(viewPos - FragPos);
+    vec3 viewDir = normalize (viewPos - FragPos);
 
-    //Directional Light
-    vec3 result = CalcDirLight(dirLight,normal,viewDir);
-    //Point Lights
+    //Directional light
+    vec3 result = CalcDirLight(dirLight, normal, viewDir);
+
+    //Point lights
     for(int i = 0;i<NR_POINT_LIGHTS;i++){
-        result += CalcPointLight(pointLights[i],normal,FragPos,viewDir);
+        result += CalcPointLight(pointLights[i],normal,FragPos, viewDir);
     }
-    //Spot Light
-    result += CalcSpotLight(spotLight,normal,FragPos,viewDir);
+    //SpotLight
+    result += CalcSpotLight(spotLight,normal,FragPos, viewDir);
+
+
     frag_color = vec4(result * vec3(uni_color),1.0);
+//    frag_color = vec4(result * vec3(uni_color),1.0) * texture(texture_sampler, outTexCoord);
+//    frag_color = uni_color;
 }
