@@ -2,9 +2,17 @@ package Engine;
 //c14210182 Mouritus Huangtara M
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,12 +22,15 @@ import static org.lwjgl.opengl.GL30.*;
 public class Object extends ShaderProgram {
     public Matrix4f model;
     List<Vector3f> vertices;
+    List<Vector2f> texture = new ArrayList<>();
+    List<Vector3f> normal = new ArrayList<>();
     Vector4f color;
     UniformsMap uniformsMap;
     int vao;
     int vbo;
     List<Vector3f> verticesColor;
     int vbocolor;
+    int texID;
     List<Object> childObject;
     Vector3f centerPosition = new Vector3f();
 
@@ -27,6 +38,8 @@ public class Object extends ShaderProgram {
     Vector3f pos = new Vector3f();
     Vector3f rotation = new Vector3f();
     Vector3f rotationWithoutParent = new Vector3f();
+
+    String texPath;
 
 
     public Object(List<ShaderModuleData> shaderModuleDataList, List<Vector3f> vertices, Vector4f color) {
@@ -43,6 +56,7 @@ public class Object extends ShaderProgram {
         childObject = new ArrayList<>();
 //        setupVAOVBO();
     }
+
 
     public Object(List<ShaderModuleData> shaderModuleDataList, List<Vector3f> vertices, List<Vector3f> verticesColor) {
         super(shaderModuleDataList);
@@ -85,6 +99,7 @@ public class Object extends ShaderProgram {
         uniformsMap.setUniform("model", model);
         uniformsMap.setUniform("view", camera.getViewMatrix());
         uniformsMap.setUniform("projection", projection.getProjMatrix());
+//        uniformsMap.setUniform("texture_sampler", 0);
         //bind vbo
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -540,6 +555,44 @@ public class Object extends ShaderProgram {
 
     public List<Object> getChildObject() {
         return childObject;
+    }
+
+    public void readTexture(String texName){
+        BufferedImage img = null;
+
+        try{
+            img = ImageIO.read(new File(texName));
+            int width = img.getWidth();
+            int height = img.getHeight();
+
+            int [] pixels = img.getRGB(0,0,width,height,null,0,width);
+            ByteBuffer b = BufferUtils.createByteBuffer((width * height) * 3);
+            for(int i = 0; i < pixels.length; i++){
+                byte rr = (byte)((pixels[i] >> 16) & 0xFF);
+                byte gg = (byte)((pixels[i] >> 8) & 0xFF);
+                byte bb = (byte)((pixels[i]) & 0xFF);
+
+                b.put(rr);
+                b.put(gg);
+                b.put(bb);
+
+            }
+
+            b.flip();
+
+            texID = glGenTextures();
+            glBindTexture(GL_TEXTURE_2D, texID);
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+            glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, b);
+
+            glBindTexture(GL_TEXTURE_2D, 0);
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
     }
 
 }

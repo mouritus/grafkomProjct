@@ -73,19 +73,19 @@ public class main {
         camera.setPosition(posX, posY, posZ);
         camera.setRotation((float) Math.toRadians(0.0f), (float) Math.toRadians(0.0f));
 
-//        objects.add(new Model(
-//                Arrays.asList(
-//                        //shaderFile lokasi menyesuaikan objectnya
-//                        new ShaderProgram.ShaderModuleData
-//                                ("resources/shaders/scene.vert"
-//                                        , GL_VERTEX_SHADER),
-//                        new ShaderProgram.ShaderModuleData
-//                                ("resources/shaders/scene.frag"
-//                                        , GL_FRAGMENT_SHADER)
-//                ),
-//                new ArrayList<>(),
-//                new Vector4f(1f, 1f, 1f, 0f), "resources/Blender/cube.obj"
-//        ));
+        objects.add(new Model(
+                Arrays.asList(
+                        //shaderFile lokasi menyesuaikan objectnya
+                        new ShaderProgram.ShaderModuleData
+                                ("resources/shaders/scene.vert"
+                                        , GL_VERTEX_SHADER),
+                        new ShaderProgram.ShaderModuleData
+                                ("resources/shaders/scene.frag"
+                                        , GL_FRAGMENT_SHADER)
+                ),
+                new ArrayList<>(),
+                new Vector4f(1f, 1f, 1f, 0f), "resources/Blender/dragon.obj"
+        ));
 
         objects.add(new Sphere(
                 Arrays.asList(
