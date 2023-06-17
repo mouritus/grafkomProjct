@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL;
 import java.lang.Math;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.glClearColor;
@@ -83,8 +84,33 @@ public class main {
                                         , GL_FRAGMENT_SHADER)
                 ),
                 new ArrayList<>(),
-                new Vector4f(1f, 1f, 1f, 0f), "resources/Blender/dukemon/Dukemon-Venda/Dukemon-Final-2.obj"
+                new Vector4f(1f, 1f, 1f, 0f), "resources/Blender/dragon.obj"
         ));
+
+        objects.add(new Sphere(
+                Arrays.asList(
+                        new ShaderProgram.ShaderModuleData(
+                                "resources/shaders/scene.vert"
+                                , GL_VERTEX_SHADER),
+                        new ShaderProgram.ShaderModuleData(
+                                "resources/shaders/scene.frag"
+                                , GL_FRAGMENT_SHADER)
+                ),
+                new ArrayList<>(
+                        List.of(
+                                new Vector3f(-0.5f,0.5f,0.0f),
+                                new Vector3f(-0.5f,-0.5f,0.0f),
+                                new Vector3f(0.5f,-0.5f,0.0f),
+                                new Vector3f(0.5f,0.5f,0.0f)
+                        )
+                ),
+                new Vector4f(0.0f,1.0f,1.0f,1.0f),
+                Arrays.asList(0.0f,0.0f,0.0f),
+                0.125f,
+                0.125f,
+                0.125f
+        ));
+
     }
 
     public void input(){

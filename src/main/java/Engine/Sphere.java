@@ -17,7 +17,7 @@ public class Sphere extends Circle {
 
     List<Integer> index = new ArrayList<>();
     int ibo;
-    List<Vector3f> normal;
+//    List<Vector3f> normal;
     int nbo;
 
     public Sphere(List<ShaderModuleData> shaderModuleDataList, List<Vector3f> vertices, Vector4f color, List<Float> centerPoint, Float rx, Float ry, Float rz) {
