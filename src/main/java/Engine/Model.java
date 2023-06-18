@@ -76,8 +76,8 @@ public class Model extends Object {
                     int objOrMtl = 0; //if obj = 1, mtl = 2
                     if (line.startsWith("o ")) {
                         objOrMtl = 1;
-                        line.
                         while (true) {
+                            line = reader.readLine();
                             if (line.startsWith("v ")) {
                                 float x = Float.parseFloat(line.split(" ")[1]);
                                 float y = Float.parseFloat(line.split(" ")[2]);
@@ -103,6 +103,7 @@ public class Model extends Object {
                     else if (line.startsWith("usemtl ")) {
                         objOrMtl = 2;
                         while (true) {
+                            line = reader.readLine();
                             if (line.startsWith("f ")) {
                                 if (line.contains("//")) {
                                     Vector3f v = new Vector3f(Float.parseFloat(line.split(" ")[1].split("//")[0]),

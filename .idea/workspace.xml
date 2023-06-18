@@ -5,15 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="97cba3ad-98bf-4fd2-883a-ae0719f9c560" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/Engine/ModelMtl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/Engine/ModelMtl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/Engine/ModelObj.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Engine/Model.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Engine/Model.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Engine/ModelObj.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Engine/ModelObj.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Engine/Model.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Engine/Model.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/main.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -124,7 +117,7 @@
         </breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/Engine/Model.java</url>
-          <line>105</line>
+          <line>106</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
