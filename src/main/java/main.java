@@ -83,7 +83,9 @@ public class main {
                                         , GL_FRAGMENT_SHADER)
                 ),
                 new ArrayList<>(),
-                new Vector4f(1f, 1f, 1f, 0f), "resources/Blender/dukemon/Dukemon-Venda/Dukemon-Final-2.obj"
+                new Vector4f(1f, 1f, 1f, 0f),
+                "resources/Blender/dukemon/Dukemon-Venda/Dukemon-Final-2.obj",
+                "resources/Blender/dukemon/Dukemon-Venda/Dukemon-Final-2.mtl"
         ));
     }
 

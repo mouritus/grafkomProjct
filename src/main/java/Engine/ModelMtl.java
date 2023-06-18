@@ -1,29 +1,20 @@
 package Engine;
 
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 
-public class ModelObj extends Object{
+public class ModelMtl extends Object{
 
     int nbo;
-    ArrayList<Vector3f> tempAllVertices;
-    ArrayList<Vector2f> tempAllVerticeTexture;
-    ArrayList<Vector3f> tempAllNormal;
-    public ModelObj(List<ShaderModuleData> shaderModuleDataList, List<Vector3f> vertices, Vector4f color, ArrayList<Vector3f> tempAllVertices, ArrayList<Vector2f> tempAllVerticeTexture, ArrayList<Vector3f> tempAllNormal) {
+    public ModelMtl(List<ShaderModuleData> shaderModuleDataList, List<Vector3f> vertices, Vector4f color, String filePath) {
         super(shaderModuleDataList, vertices, color);
-        this.tempAllNormal = tempAllNormal;
-        this.tempAllVertices = tempAllVertices;
-        this.tempAllVerticeTexture = tempAllVerticeTexture;
     }
 
     public void setupVAOVBO() {

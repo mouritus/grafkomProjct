@@ -15,46 +15,53 @@ import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 
+
 public class Model extends Object {
 
 
     int ibo;
     ArrayList<ModelObj> modelObjs = new ArrayList<>();
+    ArrayList<ModelObj> modelMtls = new ArrayList<>();
+
 
     // list kumpulan
-    ArrayList<Vector3f> tempVertices = new ArrayList<>();
-    ArrayList<Vector2f> tempVerticeTexture = new ArrayList<>();
-    ArrayList<Vector3f> tempNormal = new ArrayList<>();
+    ArrayList<Vector3f> listAllVertices = new ArrayList<>();
+    ArrayList<Vector2f> listAllVerticeTexture = new ArrayList<>();
+    ArrayList<Vector3f> listAllNormal = new ArrayList<>();
+
+    //list sementara
+    ArrayList<Vector3f> tempAllVertices = new ArrayList<>();
+    ArrayList<Vector2f> tempAllVerticeTexture = new ArrayList<>();
+    ArrayList<Vector3f> tempAllNormal = new ArrayList<>();
 
 
     List<Vector3f> normal = new ArrayList<>();
-    ArrayList<ArrayList<Vector3f>> tempFaces = new ArrayList<>(Arrays.asList(
+
+    ArrayList<ArrayList<Vector3f>> tempFacesMtlSingle = new ArrayList<>(Arrays.asList(
             //v, vt, vn
             new ArrayList<>(), new ArrayList<>(), new ArrayList<>()
     ));
 
-    ArrayList<ArrayList<Vector3f>> tempFacesMtl = new ArrayList<>(Arrays.asList(
-            //v, vt, vn
-            new ArrayList<>(), new ArrayList<>(), new ArrayList<>()
+    ArrayList<ArrayList<Vector3f>> tempFacesMtlDouble = new ArrayList<>(Arrays.asList(
+            //v, vn
+            new ArrayList<>(), new ArrayList<>()
     ));
 
 
     int nbo;
     String filePath;
+    String mtlPath;
 
 
-    public Model(List<ShaderModuleData> shaderModuleDataList, List<Vector3f> vertices, Vector4f color, String filePath) {
+    public Model(List<ShaderModuleData> shaderModuleDataList, List<Vector3f> vertices, Vector4f color, String filePath, String mtlPath) {
         super(shaderModuleDataList, vertices, color);
         this.filePath = filePath;
-        createModel();
+        this.mtlPath = mtlPath;
+        createModel(shaderModuleDataList, vertices, color);
         setupVAOVBO();
     }
 
-    public void createModel() {
-        readFile();
-    }
-
-    public void readFile() {
+    public void createModel(List<ShaderModuleData> shaderModuleDataList, List<Vector3f> vertices, Vector4f color) {
         File myObj = new File(filePath);
         if (myObj.exists()) {
             BufferedReader reader = null;
@@ -64,51 +71,85 @@ public class Model extends Object {
                 e.printStackTrace();
             }
             String line;
-            int ifObjorMtl = 0;
             try {
                 while ((line = reader.readLine()) != null) {
-                    if (line.startsWith("o ") || ifObjorMtl == 1) {
+                    int objOrMtl = 0; //if obj = 1, mtl = 2
+                    if (line.startsWith("o ")) {
+                        objOrMtl = 1;
+                        line.
                         while (true) {
-
-
-                            //if line start with o
-                            //read till line not start with v vn vt
-                            //
-                            //if line start with usemtl
-                            //read till not start with f s
-
-                            //                            if (line.startsWith("v ")) {
-//                                float x = Float.parseFloat(line.split(" ")[1]);
-//                                float y = Float.parseFloat(line.split(" ")[2]);
-//                                float z = Float.parseFloat(line.split(" ")[3]);
-//                                tempVertices.add(new Vector3f(x, y, z));
-//                            } else if (line.startsWith("vn ")) {
-//                                float x = Float.parseFloat(line.split(" ")[1]);
-//                                float y = Float.parseFloat(line.split(" ")[2]);
-//                                float z = Float.parseFloat(line.split(" ")[3]);
-//                                tempNormal.add(new Vector3f(x, y, z));
-//                            } else if (line.startsWith("vt ")) {
-//                                float x = Float.parseFloat(line.split(" ")[1]);
-//                                float y = Float.parseFloat(line.split(" ")[2]);
-//                                tempVerticeTexture.add(new Vector2f(x, y));
-//                            }
-//                        if (line.startsWith("f ")) {
-//                            Vector3f v = new Vector3f(Float.parseFloat(line.split(" ")[1].split("/")[0]),
-//                                    Float.parseFloat(line.split(" ")[2].split("/")[0]),
-//                                    Float.parseFloat(line.split(" ")[3].split("/")[0]));
-//                            Vector3f vt = new Vector3f(Float.parseFloat(line.split(" ")[1].split("/")[1]),
-//                                    Float.parseFloat(line.split(" ")[2].split("/")[1]),
-//                                    Float.parseFloat(line.split(" ")[3].split("/")[1]));
-//                            Vector3f vn = new Vector3f(Float.parseFloat(line.split(" ")[1].split("/")[2]),
-//                                    Float.parseFloat(line.split(" ")[2].split("/")[2]),
-//                                    Float.parseFloat(line.split(" ")[3].split("/")[2]));
-//                            tempFaces.get(0).add(v);
-//                            tempFaces.get(1).add(vt);
-//                            tempFaces.get(2).add(vn);
-//                        }
+                            if (line.startsWith("v ")) {
+                                float x = Float.parseFloat(line.split(" ")[1]);
+                                float y = Float.parseFloat(line.split(" ")[2]);
+                                float z = Float.parseFloat(line.split(" ")[3]);
+                                listAllVertices.add(new Vector3f(x, y, z));
+                                tempAllVertices.add(new Vector3f(x, y, z));
+                            } else if (line.startsWith("vn ")) {
+                                float x = Float.parseFloat(line.split(" ")[1]);
+                                float y = Float.parseFloat(line.split(" ")[2]);
+                                float z = Float.parseFloat(line.split(" ")[3]);
+                                listAllNormal.add(new Vector3f(x, y, z));
+                                tempAllNormal.add(new Vector3f(x, y, z));
+                            } else if (line.startsWith("vt ")) {
+                                float x = Float.parseFloat(line.split(" ")[1]);
+                                float y = Float.parseFloat(line.split(" ")[2]);
+                                listAllVerticeTexture.add(new Vector2f(x, y));
+                                tempAllVerticeTexture.add(new Vector2f(x, y));
+                            } else
+                                break;
                         }
                     }
+
+                    else if (line.startsWith("usemtl ")) {
+                        objOrMtl = 2;
+                        while (true) {
+                            if (line.startsWith("f ")) {
+                                if (line.contains("//")) {
+                                    Vector3f v = new Vector3f(Float.parseFloat(line.split(" ")[1].split("//")[0]),
+                                            Float.parseFloat(line.split(" ")[2].split("//")[0]),
+                                            Float.parseFloat(line.split(" ")[3].split("//")[0]));
+                                    Vector3f vn = new Vector3f(Float.parseFloat(line.split(" ")[1].split("//")[1]),
+                                            Float.parseFloat(line.split(" ")[2].split("//")[1]),
+                                            Float.parseFloat(line.split(" ")[3].split("//")[1]));
+
+                                    tempFacesMtlDouble.get(0).add(v);
+                                    tempFacesMtlDouble.get(1).add(vn);
+                                } else {
+                                    Vector3f v = new Vector3f(Float.parseFloat(line.split(" ")[1].split("/")[0]),
+                                            Float.parseFloat(line.split(" ")[2].split("/")[0]),
+                                            Float.parseFloat(line.split(" ")[3].split("/")[0]));
+                                    Vector3f vt = new Vector3f(Float.parseFloat(line.split(" ")[1].split("/")[1]),
+                                            Float.parseFloat(line.split(" ")[2].split("/")[1]),
+                                            Float.parseFloat(line.split(" ")[3].split("/")[1]));
+                                    Vector3f vn = new Vector3f(Float.parseFloat(line.split(" ")[1].split("/")[2]),
+                                            Float.parseFloat(line.split(" ")[2].split("/")[2]),
+                                            Float.parseFloat(line.split(" ")[3].split("/")[2]));
+                                    tempFacesMtlSingle.get(0).add(v);
+                                    tempFacesMtlSingle.get(1).add(vt);
+                                    tempFacesMtlSingle.get(2).add(vn);
+                                }
+                            } else if (line.startsWith("s ")) {
+
+                            } else
+                                break;
+                        }
+                    }
+                    switch (objOrMtl) {
+                        case 1:
+                            modelObjs.add(new ModelObj(shaderModuleDataList, vertices, color, tempAllVertices, tempAllVerticeTexture, tempAllNormal));
+
+                            tempAllVerticeTexture.clear();
+                            tempAllNormal.clear();
+                            tempAllVertices.clear();
+                        case 2:
+
+
+                            tempFacesMtlDouble.clear();
+                            tempFacesMtlSingle.clear();
+
+                    }
                 }
+
             } catch (Exception e) {
                 System.out.printf("");
                 e.printStackTrace();
@@ -122,22 +163,22 @@ public class Model extends Object {
     }
 
     public void makeModel() {
-        for (int i = 0; i < tempFaces.get(0).size(); i++) {
-            float vA = tempFaces.get(0).get(i).x - 1;
-            float vB = tempFaces.get(0).get(i).y - 1;
-            float vC = tempFaces.get(0).get(i).z - 1;
+        for (int i = 0; i < tempFacesMtlSingle.get(0).size(); i++) {
+            float vA = tempFacesMtlSingle.get(0).get(i).x - 1;
+            float vB = tempFacesMtlSingle.get(0).get(i).y - 1;
+            float vC = tempFacesMtlSingle.get(0).get(i).z - 1;
 
-            vertices.add(tempVertices.get((int) vA));
-            vertices.add(tempVertices.get((int) vB));
-            vertices.add(tempVertices.get((int) vC));
+            vertices.add(listAllVertices.get((int) vA));
+            vertices.add(listAllVertices.get((int) vB));
+            vertices.add(listAllVertices.get((int) vC));
 
-            float vnA = tempFaces.get(2).get(i).x - 1;
-            float vnB = tempFaces.get(2).get(i).y - 1;
-            float vnC = tempFaces.get(2).get(i).z - 1;
+            float vnA = tempFacesMtlSingle.get(2).get(i).x - 1;
+            float vnB = tempFacesMtlSingle.get(2).get(i).y - 1;
+            float vnC = tempFacesMtlSingle.get(2).get(i).z - 1;
 
-            normal.add(tempNormal.get((int) vnA));
-            normal.add(tempNormal.get((int) vnB));
-            normal.add(tempNormal.get((int) vnC));
+            normal.add(listAllNormal.get((int) vnA));
+            normal.add(listAllNormal.get((int) vnB));
+            normal.add(listAllNormal.get((int) vnC));
         }
     }
 
@@ -147,9 +188,8 @@ public class Model extends Object {
         //set nbo
         nbo = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, nbo);
-        //mengirim vertices ke shader
         glBufferData(GL_ARRAY_BUFFER,
-                Utils.listoFloat(vertices),
+                Utils.listoFloat(normal),
                 GL_STATIC_DRAW);
 //        uniformsMap.createUniform("lightColor");
 //        uniformsMap.createUniform("lightPos");
@@ -202,6 +242,7 @@ public class Model extends Object {
         uniformsMap.setUniform("spotLight.outerCutOff", (float) Math.cos(Math.toRadians(12.5f)));
         uniformsMap.setUniform("viewPos", camera.getPosition());
     }
+
     @Override
     public void draw(Camera camera, Projection projection) {
         for (ModelObj modelObj : modelObjs) {
