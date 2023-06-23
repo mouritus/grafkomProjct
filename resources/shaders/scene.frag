@@ -1,3 +1,14 @@
+#version 330
+//in vec3 Normal;
+//in vec3 FragPos;
+
+struct DirLight
+{
+    vec3 direction;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
 uniform DirLight dirLight;
 
 struct PointLight
@@ -41,6 +52,9 @@ uniform sampler2D texture_sampler;
 
 in vec3 Normal;
 in vec3 FragPos;
+
+uniform int hasTexture;
+
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir){
     vec3 lightDir = normalize(-light.direction);
 
@@ -122,8 +136,15 @@ void main(){
     //SpotLight
     result += CalcSpotLight(spotLight,normal,FragPos, viewDir);
 
+//    if (hasTexture == 1){
+////        frag_color = vec4(result * texture(texture_sampler, outTexCoord),1.0);
+//        frag_color = vec4(result * vec3(uni_color),1.0)* texture(texture_sampler, outTexCoord);
+//    }
+//    else{
+//        frag_color = vec4(result * vec3(uni_color),1.0);
+//    }
 
     frag_color = vec4(result * vec3(uni_color),1.0);
-//    frag_color = vec4(result * vec3(uni_color),1.0) * texture(texture_sampler, outTexCoord);
+//    frag_color = texture(texture_sampler, outTexCoord)
 //    frag_color = uni_color;
 }
