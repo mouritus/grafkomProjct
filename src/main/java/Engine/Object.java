@@ -7,14 +7,22 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.openvr.Texture;
+import org.lwjgl.stb.STBImage;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL30.*;
@@ -22,7 +30,7 @@ import static org.lwjgl.opengl.GL30.*;
 public class Object extends ShaderProgram {
     public Matrix4f model;
     List<Vector3f> vertices;
-    List<Vector2f> texture = new ArrayList<>();
+    List<Vector2f> textures = new ArrayList<>();
     List<Vector3f> normal = new ArrayList<>();
     Vector4f color;
     UniformsMap uniformsMap;
@@ -34,14 +42,17 @@ public class Object extends ShaderProgram {
     List<Object> childObject;
     Vector3f centerPosition = new Vector3f();
 
+
     //pos before animate
     Vector3f pos = new Vector3f();
     Vector3f rotation = new Vector3f();
     Vector3f rotationWithoutParent = new Vector3f();
 
-    String texPath;
+    int hasTexture;
 
-
+    public List<Vector3f> getVertices() {
+        return vertices;
+    }
     public Object(List<ShaderModuleData> shaderModuleDataList, List<Vector3f> vertices, Vector4f color) {
         super(shaderModuleDataList);
         this.vertices = vertices;
@@ -54,8 +65,10 @@ public class Object extends ShaderProgram {
 
         model = new Matrix4f();
         childObject = new ArrayList<>();
+        hasTexture = 0;
 //        setupVAOVBO();
     }
+
 
 
     public Object(List<ShaderModuleData> shaderModuleDataList, List<Vector3f> vertices, List<Vector3f> verticesColor) {
@@ -64,6 +77,7 @@ public class Object extends ShaderProgram {
         this.verticesColor = verticesColor;
         setupVAOVBOWithVerticesColor();
     }
+
 
     public void setupVAOVBO() {
         //set vao
@@ -74,6 +88,12 @@ public class Object extends ShaderProgram {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         //kirim data ke shader
         glBufferData(GL_ARRAY_BUFFER, Utils.listoFloat(vertices), GL_STATIC_DRAW);
+
+        //set texture
+
+//        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        
+//        glBufferData(GL_ARRAY_BUFFER, Utils.listoTexture(textures), GL_STATIC_DRAW);
     }
 
     public void setupVAOVBOWithVerticesColor() {
@@ -93,17 +113,26 @@ public class Object extends ShaderProgram {
         glBufferData(GL_ARRAY_BUFFER, Utils.listoFloat(verticesColor), GL_STATIC_DRAW);
     }
 
+    //Rendering
     public void drawSetup(Camera camera, Projection projection) {
         bind();
         uniformsMap.setUniform("uni_color", color);
         uniformsMap.setUniform("model", model);
         uniformsMap.setUniform("view", camera.getViewMatrix());
         uniformsMap.setUniform("projection", projection.getProjMatrix());
+//        uniformsMap.setUniform("hasTexture", 0);
 //        uniformsMap.setUniform("texture_sampler", 0);
+
         //bind vbo
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+
+//        glBindTexture(GL_TEXTURE_2D, texID);
+//        glEnableVertexAttribArray(1);
+//        glActiveTexture(GL_TEXTURE0);
+//        glBindTexture(GL_TEXTURE_2D, texID);
+//        glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
     }
 
     public void drawSetupWIthVerticesColor() {
@@ -558,41 +587,30 @@ public class Object extends ShaderProgram {
     }
 
     public void readTexture(String texName){
-        BufferedImage img = null;
+        ByteBuffer buffer;
+        int width, height;
 
-        try{
-            img = ImageIO.read(new File(texName));
-            int width = img.getWidth();
-            int height = img.getHeight();
+        try(MemoryStack stack = MemoryStack.stackPush()){
+            IntBuffer w = stack.mallocInt(1);
+            IntBuffer h = stack.mallocInt(1);
+            IntBuffer c = stack.mallocInt(1);
 
-            int [] pixels = img.getRGB(0,0,width,height,null,0,width);
-            ByteBuffer b = BufferUtils.createByteBuffer((width * height) * 3);
-            for(int i = 0; i < pixels.length; i++){
-                byte rr = (byte)((pixels[i] >> 16) & 0xFF);
-                byte gg = (byte)((pixels[i] >> 8) & 0xFF);
-                byte bb = (byte)((pixels[i]) & 0xFF);
-
-                b.put(rr);
-                b.put(gg);
-                b.put(bb);
-
+            buffer = STBImage.stbi_load(texName, w, h, c, 4);
+            if (buffer == null){
+                System.out.println(STBImage.stbi_failure_reason());
             }
-
-            b.flip();
-
-            texID = glGenTextures();
-            glBindTexture(GL_TEXTURE_2D, texID);
-            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-            glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, b);
-
-            glBindTexture(GL_TEXTURE_2D, 0);
-
-        }catch (IOException e){
-            e.printStackTrace();
+            width = w.get();
+            height = h.get();
         }
-
+        texID = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, texID);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        STBImage.stbi_image_free(buffer);
+        hasTexture = 1;
     }
 
 }
