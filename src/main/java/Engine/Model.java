@@ -46,20 +46,20 @@ public class Model extends Object {
         createModel();
         setupVAOVBO();
     }
-    public Model(List<ShaderModuleData> shaderModuleDataList, List<Vector3f> vertices, Vector4f color, String filePath, String fileTex) {
-        super(shaderModuleDataList, vertices, color);
-        this.filePath = filePath;
-        createModel();
-//        readTexture(fileTex);
-        setupVAOVBO();
-    }
-
-//    public Model(List<ShaderModuleData> shaderModuleDataList, List<Vector3f> vertices, Vector4f color, String filePath, String condition) {
+//    public Model(List<ShaderModuleData> shaderModuleDataList, List<Vector3f> vertices, Vector4f color, String filePath, String fileTex) {
 //        super(shaderModuleDataList, vertices, color);
 //        this.filePath = filePath;
-//        createModel(condition);
+//        createModel();
+//        readTexture(fileTex);
 //        setupVAOVBO();
 //    }
+
+    public Model(List<ShaderModuleData> shaderModuleDataList, List<Vector3f> vertices, Vector4f color, String filePath, String condition) {
+        super(shaderModuleDataList, vertices, color);
+        this.filePath = filePath;
+        createModel(condition);
+        setupVAOVBO();
+    }
 
     public void createModel() {
         readModel();
@@ -107,6 +107,7 @@ public class Model extends Object {
                         Vector3f vn = new Vector3f(Float.parseFloat(line.split(" ")[1].split("/")[2]),
                                 Float.parseFloat(line.split(" ")[2].split("/")[2]),
                                 Float.parseFloat(line.split(" ")[3].split("/")[2]));
+//                        System.out.println(vt);
                         faces.get(0).add(v);
                         faces.get(1).add(vt);
                         faces.get(2).add(vn);
@@ -174,6 +175,13 @@ public class Model extends Object {
                         faces.get(1).add(vt);
                         faces.get(2).add(vn);
                     }
+                    else if(line.startsWith("mtllib "))
+                    {
+                        //The file being referenced by mtllib call
+                        File lib = new File(myObj.getParentFile()+File.separator+line.split(" ")[1]);
+                        //Parse it and add all generated Materials to the mats list
+
+                    }
 
                 }
             } catch (Exception e) {
@@ -200,8 +208,8 @@ public class Model extends Object {
 
             float vtA = faces.get(1).get(i).x - 1;
             float vtB = faces.get(1).get(i).y - 1;
-            texture.add(tempTexture.get((int) vtA));
-            texture.add(tempTexture.get((int) vtB));
+            textures.add(tempTexture.get((int) vtA));
+            textures.add(tempTexture.get((int) vtB));
 
             float vnA = faces.get(2).get(i).x - 1;
             float vnB = faces.get(2).get(i).y - 1;
@@ -223,6 +231,7 @@ public class Model extends Object {
         glBufferData(GL_ARRAY_BUFFER,
                 Utils.listoFloat(normal),
                 GL_STATIC_DRAW);
+
 //        uniformsMap.createUniform("lightColor");
 //        uniformsMap.createUniform("lightPos");
     }

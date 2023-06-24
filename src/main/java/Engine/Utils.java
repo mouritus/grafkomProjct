@@ -1,8 +1,10 @@
 package Engine;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.Arrays;
 import java.util.List;
 
 public class Utils {
@@ -24,6 +26,17 @@ public class Utils {
             arr[index++] = arraylist.get(i).x;
             arr[index++] = arraylist.get(i).y;
             arr[index++] = arraylist.get(i).z;
+        }
+//        System.out.println(Arrays.toString(arr));
+        return arr;
+    }
+
+    public static float[] listoTexture(List<Vector2f> arraylist){
+        float[] arr = new float[arraylist.size()*2];
+        int index = 0;
+        for(int i = 0;i<arraylist.size();i++){
+            arr[index++] = arraylist.get(i).x;
+            arr[index++] = arraylist.get(i).y;
         }
         return arr;
     }

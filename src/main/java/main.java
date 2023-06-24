@@ -84,32 +84,33 @@ public class main {
                                         , GL_FRAGMENT_SHADER)
                 ),
                 new ArrayList<>(),
-                new Vector4f(1f, 1f, 1f, 0f), "resources/Blender/dragon.obj"
+                new Vector4f(1f, 1f, 1f, 0f), "resources/Blender/backrooms.obj"
         ));
-
-        objects.add(new Sphere(
-                Arrays.asList(
-                        new ShaderProgram.ShaderModuleData(
-                                "resources/shaders/scene.vert"
-                                , GL_VERTEX_SHADER),
-                        new ShaderProgram.ShaderModuleData(
-                                "resources/shaders/scene.frag"
-                                , GL_FRAGMENT_SHADER)
-                ),
-                new ArrayList<>(
-                        List.of(
-                                new Vector3f(-0.5f,0.5f,0.0f),
-                                new Vector3f(-0.5f,-0.5f,0.0f),
-                                new Vector3f(0.5f,-0.5f,0.0f),
-                                new Vector3f(0.5f,0.5f,0.0f)
-                        )
-                ),
-                new Vector4f(0.0f,1.0f,1.0f,1.0f),
-                Arrays.asList(0.0f,0.0f,0.0f),
-                0.125f,
-                0.125f,
-                0.125f
-        ));
+        objects.get(0).translateObject(0f,-1f,0f);
+//        objects.get(0).rotateObject((float)Math.toRadians(180),0f,1f,0f);
+//        objects.add(new Sphere(
+//                Arrays.asList(
+//                        new ShaderProgram.ShaderModuleData(
+//                                "resources/shaders/scene.vert"
+//                                , GL_VERTEX_SHADER),
+//                        new ShaderProgram.ShaderModuleData(
+//                                "resources/shaders/scene.frag"
+//                                , GL_FRAGMENT_SHADER)
+//                ),
+//                new ArrayList<>(
+//                        List.of(
+//                                new Vector3f(-0.5f,0.5f,0.0f),
+//                                new Vector3f(-0.5f,-0.5f,0.0f),
+//                                new Vector3f(0.5f,-0.5f,0.0f),
+//                                new Vector3f(0.5f,0.5f,0.0f)
+//                        )
+//                ),
+//                new Vector4f(0.0f,1.0f,1.0f,1.0f),
+//                Arrays.asList(0.0f,0.0f,0.0f),
+//                0.125f,
+//                0.125f,
+//                0.125f
+//        ));
 
     }
 
@@ -197,9 +198,6 @@ public class main {
                 state = false;
             }
         }
-
-
-
     }
 
 
