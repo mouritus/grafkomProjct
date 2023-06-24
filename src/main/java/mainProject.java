@@ -27,9 +27,10 @@ public class mainProject {
     private boolean dragDrop = false;
     private float posX = 0.0f;
     private float posY = 0.025f;
-    private float posZ = 3f;
+    private float posZ = 2f;
     private boolean state = false;
     private float rotate = 0f;
+    float camRotation= 0.2f;
 
 
     private ArrayList<Double> valueArray = new ArrayList<>();
@@ -54,7 +55,7 @@ public class mainProject {
         window.init();
         GL.createCapabilities();
 
-        camera.setPosition(posX, posY, posZ);
+
 //        camera.setRotation((float) Math.toRadians(0.0f), (float) Math.toRadians(0.0f));
 
         //Wall
@@ -144,7 +145,20 @@ public class mainProject {
         }
         return false;
     }
+    public void camRotateChar(Object object) {
+        Vector3f tempCenterPoint = object.updateCenterPointObject();
+        float x = tempCenterPoint.x + 1.1f * (float) (Math.cos(Math.toRadians(1f)));
+        float z = tempCenterPoint.z + 1.1f * (float) (Math.sin(Math.toRadians(camRotation)));
 
+        camera.setPosition(x,tempCenterPoint.y + 0.8f, z);
+        camRotation += 0.2f;
+        camera.setRotation(0, (float) Math.toRadians(camRotation - 90));
+        if (camRotation >= 360) {
+            camRotation -= 360;
+        }
+
+
+    }
 
     public void move(){
         float move = 0.025f;
@@ -179,7 +193,13 @@ public class mainProject {
                 objects.get(0).translateObject(move, 0f, 0f);
             }
         }
-
+        // berputar
+        if (window.isKeyPressed(GLFW_KEY_E)) {
+            if (!checkCollide(x, y, z - 0.1f)) {
+//                camera.moveForward(move);
+                objects.get(0).rotateObject((float) Math.toRadians(7f), 0.0f, 1.0f, 0.0f);
+            }
+        }
 
         if (window.getMousInput().isLeftButtonPressed()) {
             Vector2f displayVector = window.getMousInput().getDisplVec();
@@ -224,6 +244,9 @@ public class mainProject {
             for (Object object : objects) {
                 object.draw(camera, projection);
             }
+            Vector3f tempCenterPoint = objects.get(0).updateCenterPointObject();
+
+            camera.setPosition(tempCenterPoint.x,tempCenterPoint.y+1.3f,tempCenterPoint.z);
 
 //            for (Object object : objectsRectangle) {
 //                object.draw(camera, projection);
