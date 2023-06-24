@@ -27,10 +27,9 @@ public class mainProject {
     private boolean dragDrop = false;
     private float posX = 0.0f;
     private float posY = 0.025f;
-    private float posZ = 2f;
+    private float posZ = 3f;
     private boolean state = false;
     private float rotate = 0f;
-    float camRotation= 0.2f;
 
 
     private ArrayList<Double> valueArray = new ArrayList<>();
@@ -55,7 +54,7 @@ public class mainProject {
         window.init();
         GL.createCapabilities();
 
-
+        camera.setPosition(posX, posY, posZ);
 //        camera.setRotation((float) Math.toRadians(0.0f), (float) Math.toRadians(0.0f));
 
         //Wall
@@ -102,6 +101,49 @@ public class mainProject {
                 new Vector4f(1f, 1f, 1f, 0f), "resources/Blender/Project/trap.obj"
         ));
 
+        //Extra Room
+        Environment.get(0).getChildObject().add(new Model(
+                Arrays.asList(
+                        //shaderFile lokasi menyesuaikan objectnya
+                        new ShaderProgram.ShaderModuleData
+                                ("resources/shaders/scene.vert"
+                                        , GL_VERTEX_SHADER),
+                        new ShaderProgram.ShaderModuleData
+                                ("resources/shaders/scene.frag"
+                                        , GL_FRAGMENT_SHADER)
+                ),
+                new ArrayList<>(),
+                new Vector4f(1f, 1f, 1f, 0f), "resources/Blender/Project/ceil.obj"
+        ));
+
+        Environment.get(0).getChildObject().get(0).getChildObject().add(new Model(
+                Arrays.asList(
+                        //shaderFile lokasi menyesuaikan objectnya
+                        new ShaderProgram.ShaderModuleData
+                                ("resources/shaders/scene.vert"
+                                        , GL_VERTEX_SHADER),
+                        new ShaderProgram.ShaderModuleData
+                                ("resources/shaders/scene.frag"
+                                        , GL_FRAGMENT_SHADER)
+                ),
+                new ArrayList<>(),
+                new Vector4f(1f, 1f, 1f, 0f), "resources/Blender/Project/light.obj"
+        ));
+
+        Environment.get(0).getChildObject().get(0).getChildObject().add(new Model(
+                Arrays.asList(
+                        //shaderFile lokasi menyesuaikan objectnya
+                        new ShaderProgram.ShaderModuleData
+                                ("resources/shaders/scene.vert"
+                                        , GL_VERTEX_SHADER),
+                        new ShaderProgram.ShaderModuleData
+                                ("resources/shaders/scene.frag"
+                                        , GL_FRAGMENT_SHADER)
+                ),
+                new ArrayList<>(),
+                new Vector4f(1f, 1f, 1f, 0f), "resources/Blender/Project/vent.obj"
+        ));
+
         Environment.get(0).translateObject(0f,-1f,0f);
 
 
@@ -122,43 +164,89 @@ public class mainProject {
         objects.get(0).rotateObject((float)Math.toRadians(180),0f,1f,0f);
         objects.get(0).scaleObject(0.3f,0.3f,0.3f);
 
-        objects.add(new Model(
-                Arrays.asList(
-                        //shaderFile lokasi menyesuaikan objectnya
-                        new ShaderProgram.ShaderModuleData
-                                ("resources/shaders/scene.vert"
-                                        , GL_VERTEX_SHADER),
-                        new ShaderProgram.ShaderModuleData
-                                ("resources/shaders/scene.frag"
-                                        , GL_FRAGMENT_SHADER)
-                ),
-                new ArrayList<>(),
-                new Vector4f(0.9f, 1f, 0.3f, 0f), "resources/Blender/Project/SWAT.obj"
-        ));
 
 //        System.out.println(Environment.get(0).getVertices());
     }
 
     public boolean checkCollide(float x, float y, float z){
-        if (getDist(x, y, z, Environment.get(0).updateCenterPointObject().get(0), Environment.get(0).updateCenterPointObject().get(1), Environment.get(0).updateCenterPointObject().get(2)) >= 10){
+        System.out.println(x +", "+y+", "+z );
+        boolean floor = y <= Environment.get(0).getChildObject().get(0).updateCenterPointObject().get(1);
+        boolean borderWall =
+                z >= Environment.get(0).updateCenterPointObject().get(2) + 9.8 ||
+                z <= Environment.get(0).updateCenterPointObject().get(2) - 9.8 ||
+                x >= Environment.get(0).updateCenterPointObject().get(0) + 10 ||
+                x <= Environment.get(0).updateCenterPointObject().get(0) - 9.5;
+        boolean wall1 =
+                (z <= Environment.get(0).updateCenterPointObject().get(2) - 0.05 &&
+                z >= Environment.get(0).updateCenterPointObject().get(2) - 4.5 &&
+                x >= Environment.get(0).updateCenterPointObject().get(0) + 1.3 &&
+                x <= Environment.get(0).updateCenterPointObject().get(0) + 1.5);
+        boolean wall2 =
+                (z <= Environment.get(0).updateCenterPointObject().get(2) - 2.5 &&
+                 z >= Environment.get(0).updateCenterPointObject().get(2) - 4.5 &&
+                 x >= Environment.get(0).updateCenterPointObject().get(0) - 1.42 &&
+                 x <= Environment.get(0).updateCenterPointObject().get(0) + 6.9);
+        boolean wall3 =
+                (z <= Environment.get(0).updateCenterPointObject().get(2) + 3.7 &&
+                z >= Environment.get(0).updateCenterPointObject().get(2) - 4.5 &&
+                x >= Environment.get(0).updateCenterPointObject().get(0) + 6.5 &&
+                x <= Environment.get(0).updateCenterPointObject().get(0) + 6.8)
+                ;
+        boolean TWall =
+                (z <= Environment.get(0).updateCenterPointObject().get(2) -2.5 &&
+                z >= Environment.get(0).updateCenterPointObject().get(2) - 7.4 &&
+                x >= Environment.get(0).updateCenterPointObject().get(0) -3 &&
+                x <= Environment.get(0).updateCenterPointObject().get(0) -2.7) ||
+                (z <= Environment.get(0).updateCenterPointObject().get(2) -6.9 &&
+                z >= Environment.get(0).updateCenterPointObject().get(2) - 7.4 &&
+                x >= Environment.get(0).updateCenterPointObject().get(0) -4.9 &&
+                x <= Environment.get(0).updateCenterPointObject().get(0) -0.25);
+        boolean SideWall =
+                (z <= Environment.get(0).updateCenterPointObject().get(2) + 8.9 &&
+                z >= Environment.get(0).updateCenterPointObject().get(2) + 0.75 &&
+                x >= Environment.get(0).updateCenterPointObject().get(0) -7.3 &&
+                x <= Environment.get(0).updateCenterPointObject().get(0) -6.95) ||
+                (z <= Environment.get(0).updateCenterPointObject().get(2) -0.1 &&
+                z >= Environment.get(0).updateCenterPointObject().get(2) - 8.1 &&
+                x >= Environment.get(0).updateCenterPointObject().get(0) -7.3 &&
+                x <= Environment.get(0).updateCenterPointObject().get(0) -6.95);
+//        boolean trap =
+//                (z <= Environment.get(0).updateCenterPointObject().get(2) + 9.5 &&
+//                        z >= Environment.get(0).updateCenterPointObject().get(2) + 3.6 &&
+//                        x >= Environment.get(0).updateCenterPointObject().get(0) -5.7 &&
+//                        x <= Environment.get(0).updateCenterPointObject().get(0) -1.3);
+        boolean trap =
+                (z >= Environment.get(0).updateCenterPointObject().get(2) + 3.6 &&
+                x >= Environment.get(0).updateCenterPointObject().get(0) -1.6 &&
+                x <= Environment.get(0).updateCenterPointObject().get(0) -1.3) ||
+
+                (z >= Environment.get(0).updateCenterPointObject().get(2) + 3.6 &&
+                z <= Environment.get(0).updateCenterPointObject().get(2) + 3.8 &&
+                x >= Environment.get(0).updateCenterPointObject().get(0) -4.5 &&
+                x <= Environment.get(0).updateCenterPointObject().get(0) -1.3)||
+
+                (z >= Environment.get(0).updateCenterPointObject().get(2) + 3.6 &&
+                z <= Environment.get(0).updateCenterPointObject().get(2) + 7.2 &&
+                x >= Environment.get(0).updateCenterPointObject().get(0) -4.5 &&
+                x <= Environment.get(0).updateCenterPointObject().get(0) -4.3)||
+
+                (z >= Environment.get(0).updateCenterPointObject().get(2) + 3.6 &&
+                x >= Environment.get(0).updateCenterPointObject().get(0) -5.7 &&
+                x <= Environment.get(0).updateCenterPointObject().get(0) -5.1)
+                ;
+        boolean floorCollide =
+                y >= Environment.get(0).updateCenterPointObject().get(2) + 9.5 &&
+                x >= Environment.get(0).updateCenterPointObject().get(0) -4.5 &&
+                x <= Environment.get(0).updateCenterPointObject().get(0) -5.1;
+        if(borderWall || wall1 || wall2 || wall3 || TWall || SideWall || trap){
             return true;
         }
+//        if (getDist(x, y, z, Environment.get(0).updateCenterPointObject().get(0), Environment.get(0).updateCenterPointObject().get(1), Environment.get(0).updateCenterPointObject().get(2)) >= 10){
+//            return true;
+//        }
         return false;
     }
-    public void camRotateChar(Object object) {
-        Vector3f tempCenterPoint = object.updateCenterPointObject();
-        float x = tempCenterPoint.x + 1.1f * (float) (Math.cos(Math.toRadians(1f)));
-        float z = tempCenterPoint.z + 1.1f * (float) (Math.sin(Math.toRadians(camRotation)));
 
-        camera.setPosition(x,tempCenterPoint.y + 0.8f, z);
-        camRotation += 0.2f;
-        camera.setRotation(0, (float) Math.toRadians(camRotation - 90));
-        if (camRotation >= 360) {
-            camRotation -= 360;
-        }
-
-
-    }
 
     public void move(){
         float move = 0.025f;
@@ -193,13 +281,7 @@ public class mainProject {
                 objects.get(0).translateObject(move, 0f, 0f);
             }
         }
-        // berputar
-        if (window.isKeyPressed(GLFW_KEY_E)) {
-            if (!checkCollide(x, y, z - 0.1f)) {
-//                camera.moveForward(move);
-                objects.get(0).rotateObject((float) Math.toRadians(7f), 0.0f, 1.0f, 0.0f);
-            }
-        }
+
 
         if (window.getMousInput().isLeftButtonPressed()) {
             Vector2f displayVector = window.getMousInput().getDisplVec();
@@ -208,7 +290,7 @@ public class mainProject {
             camera.addRotation(0, (float) Math.toRadians(displayVector.y * 0.1));
 //            objects.get(0).rotateObjectAnimate();
         }
-        System.out.println(getDist(x, y, z, Environment.get(0).updateCenterPointObject().get(0), Environment.get(0).updateCenterPointObject().get(1), Environment.get(0).updateCenterPointObject().get(2)));
+
 
     }
     public void input(){
@@ -219,10 +301,10 @@ public class mainProject {
             window.getMousInput().setScroll(new Vector2f(0f,0f));
         }
     }
-
-    public float getDist(float x1, float y1, float z1, float x2, float y2, float z2) {
-        return (float) Math.sqrt(Math.pow(Math.abs(x1 - x2), 2) + Math.pow(Math.abs(y2 - y1), 2) + Math.pow(Math.abs(z2 - z1), 2));
-    }
+    //Jarak collision kalau objectnya lingkaran
+//    public float getDist(float x1, float y1, float z1, float x2, float y2, float z2) {
+//        return (float) Math.sqrt(Math.pow(Math.abs(x1 - x2), 2) + Math.pow(Math.abs(y2 - y1), 2) + Math.pow(Math.abs(z2 - z1), 2));
+//    }
 
     public void loop() {
         while (window.isOpen()) {
@@ -244,9 +326,6 @@ public class mainProject {
             for (Object object : objects) {
                 object.draw(camera, projection);
             }
-            Vector3f tempCenterPoint = objects.get(0).updateCenterPointObject();
-
-            camera.setPosition(tempCenterPoint.x,tempCenterPoint.y+1.3f,tempCenterPoint.z);
 
 //            for (Object object : objectsRectangle) {
 //                object.draw(camera, projection);

@@ -14,6 +14,7 @@ import java.util.List;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL30.*;
+
 public class main {
     Camera camera = new Camera();
     private Window window = new Window(800, 800, "Hello World");
