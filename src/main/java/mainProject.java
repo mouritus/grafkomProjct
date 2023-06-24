@@ -121,34 +121,63 @@ public class mainProject {
         objects.get(0).rotateObject((float)Math.toRadians(180),0f,1f,0f);
         objects.get(0).scaleObject(0.3f,0.3f,0.3f);
 
+        objects.add(new Model(
+                Arrays.asList(
+                        //shaderFile lokasi menyesuaikan objectnya
+                        new ShaderProgram.ShaderModuleData
+                                ("resources/shaders/scene.vert"
+                                        , GL_VERTEX_SHADER),
+                        new ShaderProgram.ShaderModuleData
+                                ("resources/shaders/scene.frag"
+                                        , GL_FRAGMENT_SHADER)
+                ),
+                new ArrayList<>(),
+                new Vector4f(0.9f, 1f, 0.3f, 0f), "resources/Blender/Project/SWAT.obj"
+        ));
+
 //        System.out.println(Environment.get(0).getVertices());
     }
 
-    public boolean checkCollide(){
+    public boolean checkCollide(float x, float y, float z){
+        if (getDist(x, y, z, Environment.get(0).updateCenterPointObject().get(0), Environment.get(0).updateCenterPointObject().get(1), Environment.get(0).updateCenterPointObject().get(2)) >= 10){
+            return true;
+        }
         return false;
     }
-    public void input(){
+
+
+    public void move(){
         float move = 0.025f;
-
-
+        float x = objects.get(0).updateCenterPointObject().get(0);
+        float y = objects.get(0).updateCenterPointObject().get(1);
+        float z = objects.get(0).updateCenterPointObject().get(2);
+        //Maju
         if (window.isKeyPressed(GLFW_KEY_W)) {
-            camera.moveForward(move);
-            objects.get(0).translateObject(0f,0f,-move);
+            if (!checkCollide(x, y, z - 0.1f)) {
+                camera.moveForward(move);
+                objects.get(0).translateObject(0f, 0f, -move);
+            }
         }
-
+        //Kiri
         if (window.isKeyPressed(GLFW_KEY_A)) {
-            camera.moveLeft(move);
-            objects.get(0).translateObject(-move,0f,0f);
+            if (!checkCollide(x-0.1f, y, z)) {
+                camera.moveLeft(move);
+                objects.get(0).translateObject(-move, 0f, 0f);
+            }
         }
-
+        //Mundur
         if (window.isKeyPressed(GLFW_KEY_S)) {
-            camera.moveBackwards(move);
-            objects.get(0).translateObject(0f,0f,move);
+            if (!checkCollide(x, y, z + 0.1f)) {
+                camera.moveBackwards(move);
+                objects.get(0).translateObject(0f, 0f, move);
+            }
         }
-
+        //Kanan
         if (window.isKeyPressed(GLFW_KEY_D)) {
-            camera.moveRight(move);
-            objects.get(0).translateObject(move,0f,0f);
+            if (!checkCollide(x+0.1f, y, z)) {
+                camera.moveRight(move);
+                objects.get(0).translateObject(move, 0f, 0f);
+            }
         }
 
 
@@ -159,7 +188,11 @@ public class mainProject {
             camera.addRotation(0, (float) Math.toRadians(displayVector.y * 0.1));
 //            objects.get(0).rotateObjectAnimate();
         }
+        System.out.println(getDist(x, y, z, Environment.get(0).updateCenterPointObject().get(0), Environment.get(0).updateCenterPointObject().get(1), Environment.get(0).updateCenterPointObject().get(2)));
 
+    }
+    public void input(){
+        move();
 
         if (window.getMousInput().getScroll().y != 0) {
             projection.setFOV(projection.getFOV() - window.getMousInput().getScroll().y * 0.1f);
@@ -167,7 +200,6 @@ public class mainProject {
         }
     }
 
-    //x1 = distance player, x2 = distance object
     public float getDist(float x1, float y1, float z1, float x2, float y2, float z2) {
         return (float) Math.sqrt(Math.pow(Math.abs(x1 - x2), 2) + Math.pow(Math.abs(y2 - y1), 2) + Math.pow(Math.abs(z2 - z1), 2));
     }
